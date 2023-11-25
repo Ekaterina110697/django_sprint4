@@ -90,10 +90,9 @@ def create_post(request):
     form = PostForm(request.POST or None, files=request.FILES or None)
     if not form.is_valid():
         return render(request, 'blog/create.html', {'form': form})
-    else:
-        new_post = form.save(commit=False)
-        new_post.author = request.user
-        new_post.save()
+    new_post = form.save(commit=False)
+    new_post.author = request.user
+    new_post.save()
 
     return redirect('blog:profile', username=request.user)
 
@@ -130,11 +129,10 @@ def add_comment(request, post_id):
     form = CommentForm(request.POST)
     if not form.is_valid():
         return render(request, 'blog/create.html', {'form': form})
-    else:
-        comment = form.save(commit=False)
-        comment.author = request.user
-        comment.post = post
-        comment.save()
+    comment = form.save(commit=False)
+    comment.author = request.user
+    comment.post = post
+    comment.save()
     return redirect('blog:post_detail', post_id=post_id)
 
 
@@ -142,6 +140,7 @@ def add_comment(request, post_id):
 def edit_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment,
                                 pk=comment_id,
+                                post_id=post_id,
                                 author=request.user)
     form = CommentForm(request.POST or None, instance=comment)
     context = {'form': form, 'comment': comment}
@@ -155,6 +154,7 @@ def edit_comment(request, post_id, comment_id):
 def delete_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment,
                                 pk=comment_id,
+                                post_id=post_id,
                                 author=request.user)
     context = {'comment': comment}
     if request.method == 'POST':
