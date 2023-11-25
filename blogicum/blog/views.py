@@ -32,14 +32,12 @@ def index(request):
 
 def post_detail(request, post_id):
     post = get_object_or_404(
-        Post,
+        get_posts_queryset(apply_filters=False, with_annotation=False),
         pk=post_id)
-    if (
-            post.author != request.user
-            and not (
+    if post.author != request.user and not (
             post.is_published
             and post.category.is_published
-            and post.pub_date <= timezone.now())
+            and post.pub_date <= timezone.now()
     ):
         raise Http404('Страница не существует')
     form = CommentForm()
@@ -97,7 +95,7 @@ def create_post(request):
         new_post.author = request.user
         new_post.save()
 
-        return redirect('blog:profile', username=request.user)
+    return redirect('blog:profile', username=request.user)
 
 
 @login_required
@@ -130,7 +128,9 @@ def add_comment(request, post_id):
     if post.author != request.user:
         post = get_object_or_404(get_posts_queryset(), pk=post_id)
     form = CommentForm(request.POST)
-    if form.is_valid():
+    if not form.is_valid():
+        return render(request, 'blog/create.html', {'form': form})
+    else:
         comment = form.save(commit=False)
         comment.author = request.user
         comment.post = post
@@ -142,8 +142,7 @@ def add_comment(request, post_id):
 def edit_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment,
                                 pk=comment_id,
-                                author=request.user,
-                                post_id=post_id)
+                                author=request.user)
     form = CommentForm(request.POST or None, instance=comment)
     context = {'form': form, 'comment': comment}
     if form.is_valid():
@@ -156,7 +155,6 @@ def edit_comment(request, post_id, comment_id):
 def delete_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment,
                                 pk=comment_id,
-                                post=post_id,
                                 author=request.user)
     context = {'comment': comment}
     if request.method == 'POST':

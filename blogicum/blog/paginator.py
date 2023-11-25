@@ -1,7 +1,5 @@
+from blogicum.settings import POSTS_ON_PAGE
 from django.core.paginator import Paginator
-
-
-POSTS_ON_PAGE = 10
 
 
 def paginate(request, post_list):
