@@ -8,19 +8,27 @@
   
 ## Как запустить проект:
 В директории с проектом
-1. Создание виртуального окружения:
+
+Cоздать и активировать виртуальное окружение:
+
 ```
-python -m venv venv
+python -m venv env
 ```
-2. Активация виртуального окружения:
+
 ```
 source venv\Scripts\activate  
 ```
-3. Установка зависимостей:
+
+Установить зависимости из файла requirements.txt:
+
+```
+python -m pip install --upgrade pip
+```
+
 ```
 pip install -r requirements.txt
 ```
-4. Запуск отладочного сервера:
+Запуск сервера:
 ```
 cd blogicum
 python manage.py runserver
